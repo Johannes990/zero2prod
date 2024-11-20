@@ -3,6 +3,6 @@ fn main() {
     let a = 100;
     let mut b = 120;
     println!("a={}, b={}", a, b);
-    b = a + 2;
+    b = a + 2651;
     println!("b is now: {}", b);
 }
