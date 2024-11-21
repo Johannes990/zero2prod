@@ -1,8 +1,10 @@
-fn main() {
-    println!("Hello, world!");
-    let a = 100;
-    let mut b = 120;
-    println!("a={}, b={}", a, b);
-    b = a + 2651;
-    println!("b is now: {}", b);
+use std::net::TcpListener;
+use zero2prod::run;
+
+#[tokio::main]
+async fn main() -> Result<(), std::io::Error> {
+    // Bubble up the error if we failed to bind the address
+    // otherwise call .await on our server
+    let listener = TcpListener::bind("127.0.0.1:0")?;
+    run(listener)?.await
 }

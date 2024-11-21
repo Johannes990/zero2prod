@@ -3,8 +3,20 @@ name = "zero2prod"
 version = "0.1.0"
 edition = "2021"
 
+[lib]
+# We could specify a library name using the 'name' field. If unspecified
+# cargo will default to 'package.name'
+path = "src/lib.rs"
+
+# double square brackets is an array in TOML syntax.
+# We can only have one library in a project, but we can have multiple binaries!
+# if we need to manage multiple binaries in the same repository,
+# have a look at the workspace feature - will be covered later on.
 [[bin]]
 path = "src/main.rs"
 name = "zero2prod"
 
 [dependencies]
+actix-web = "4.9.0"
+tokio = { version = "1.41.1", features = ["macros", "rt-multi-thread"]}
+reqwest = "0.12.9"
