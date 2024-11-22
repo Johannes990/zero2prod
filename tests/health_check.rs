@@ -17,7 +17,7 @@ fn spawn_app() -> String {
     // Port 0 triggers the OS to search for an available port which to bind to
     let listener = TcpListener::bind("127.0.0.1:0").expect("Failed to bind to random port");
     let port = listener.local_addr().unwrap().port();
-    let server = zero2prod::run(listener).expect("Failed to bind to address");
+    let server = zero2prod::startup::run(listener).expect("Failed to bind to address");
 
     // launch the server as a background task
     // tokio::spawn returns a handle to the spawned future
