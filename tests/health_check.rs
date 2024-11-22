@@ -5,9 +5,8 @@
 //!
 //! we can inspect using
 //! `cargo expand --test health_check` (<- name of the test file)
-
-use std::net::TcpListener;
 use sqlx::{Connection, PgConnection};
+use std::net::TcpListener;
 use zero2prod::configuration::get_configuration;
 
 // No .await call, therefore no need for `spawn_app` to be async now.

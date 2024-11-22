@@ -30,7 +30,7 @@ pub fn get_configuration() -> Result<Settings, config::ConfigError> {
         // add configuration value from a file named 'configuration.yaml'
         .add_source(config::File::new(
             "configuration.yaml",
-            config::FileFormat::Yaml
+            config::FileFormat::Yaml,
         ))
         .build()?;
     // try to convert read settings into a Config type
