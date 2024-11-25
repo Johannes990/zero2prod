@@ -2,7 +2,6 @@
 use actix_web::{web, HttpResponse};
 use chrono::Utc;
 use sqlx::PgPool;
-use sqlx::types::{chrono, uuid};
 use uuid::Uuid;
 
 #[allow(dead_code)]

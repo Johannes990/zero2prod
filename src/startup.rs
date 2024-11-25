@@ -6,10 +6,7 @@ use std::net::TcpListener;
 
 // We return Server on the happy path and we drop the `async` keyword.
 // We have no need for it since we have no .await call.
-pub fn run(
-    listener: TcpListener,
-    db_pool: PgPool,
-) -> Result<Server, std::io::Error> {
+pub fn run(listener: TcpListener, db_pool: PgPool) -> Result<Server, std::io::Error> {
     let db_pool = web::Data::new(db_pool);
     let server = HttpServer::new(move || {
         App::new()

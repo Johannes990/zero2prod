@@ -7,9 +7,7 @@ use zero2prod::startup::run;
 async fn main() -> Result<(), std::io::Error> {
     // panic if we don't read configuration
     let configuration = get_configuration().expect("Failed to read configuration.");
-    let connection_pool = PgPool::connect(
-        &configuration.database.connection_string()
-    )
+    let connection_pool = PgPool::connect(&configuration.database.connection_string())
         .await
         .expect("Failed to connect to Postgres.");
     // Bubble up the error if we failed to bind the address
