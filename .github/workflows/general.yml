@@ -97,8 +97,24 @@ jobs:
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           components: clippy
+      - name: Set up database and create app user
+        run: |
+          sudo apt-get install postgresql-client
+
+          # Create the application user
+          CREATE_QUERY="CREATE USER app WITH PASSWORD 'secret';"
+          PGPASSWORD="password" psql -U postgres -h localhost -c "${CREATE_QUERY}"
+
+          # Grant privileges
+          GRANT_QUERY="ALTER USER app CREATEDB;"
+          PGPASSWORD="password" psql -U postgres -h localhost -c "${GRANT_QUERY}"
+      - name: Set DATABASE_URL
+        run: echo "DATABASE_URL=postgres://app:secret@localhost:5432/newsletter" >> $GITHUB_ENV
       - name: Linting
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL }}
         run: cargo clippy -- -D warnings
+
 
   coverage:
     name: Code coverage
