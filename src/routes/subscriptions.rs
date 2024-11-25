@@ -1,11 +1,11 @@
 //! src/routes/subscriptions.rs
+#[allow(unused_imports)]
 use actix_web::{web, HttpResponse};
 use chrono::Utc;
 use sqlx::PgPool;
 use uuid::Uuid;
 
 #[allow(dead_code)]
-#[allow(unused_imports)]
 #[derive(serde::Deserialize)]
 pub struct FormData {
     email: String,
