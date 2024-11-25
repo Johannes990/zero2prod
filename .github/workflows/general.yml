@@ -108,6 +108,10 @@ jobs:
           # Grant privileges
           GRANT_QUERY="ALTER USER app CREATEDB;"
           PGPASSWORD="password" psql -U postgres -h localhost -c "${GRANT_QUERY}"
+      - name: Migrate database
+        run: |
+          chmod +x ./scripts/init_db.sh
+          SKIP_DOCKER=true ./scripts/init_db.sh
       - name: Set DATABASE_URL
         run: echo "DATABASE_URL=postgres://app:secret@localhost:5432/newsletter" >> $GITHUB_ENV
       - name: Linting
