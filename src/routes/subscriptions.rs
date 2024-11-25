@@ -29,12 +29,13 @@ pub async fn subscribe(
     )
     // We use get_ref() to get an immutable reference to the 'PgConnection'
     // wrapped by 'web::data'
-        .execute(pool.get_ref())
-        .await {
+    .execute(pool.get_ref())
+    .await
+    {
         Ok(_) => HttpResponse::Ok().finish(),
         Err(e) => {
             println!("Failed to execute query: {}", e);
             HttpResponse::InternalServerError().finish()
-        },
+        }
     }
 }
