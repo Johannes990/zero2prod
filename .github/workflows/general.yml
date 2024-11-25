@@ -97,6 +97,12 @@ jobs:
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           components: clippy
+      - name: Install sqlx-cli
+        run: cargo install sqlx-cli
+          --version=${{ env.SQLX_VERSION }}
+          --features ${{ env.SQLX_FEATURES }}
+          --no-default-features
+          --locked
       - name: Set up database and create app user
         run: |
           sudo apt-get install postgresql-client
