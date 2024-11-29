@@ -20,13 +20,16 @@ pub async fn subscribe(
     // request id to correlate requests with log messages
     let request_id = Uuid::new_v4();
 
-    log::info!(
+    tracing::info!(
         "request_id: {} - Adding user: '{}' '{}' as a new subscriber",
         request_id,
         form.email,
         form.name
     );
-    log::info!("request_id: {} - Saving new subscriber info to database", request_id);
+    tracing::info!(
+        "request_id: {} - Saving new subscriber info to database",
+        request_id
+    );
     match sqlx::query!(
         r#"
         INSERT INTO subscriptions (id, email, name, subscribed_at)
@@ -43,14 +46,18 @@ pub async fn subscribe(
     .await
     {
         Ok(_) => {
-            log::info!(
+            tracing::info!(
                 "request_id: {} - New subscriber details have been saved in the database",
                 request_id
             );
             HttpResponse::Ok().finish()
         },
         Err(e) => {
-            log::error!("request_id: {} - Failed to execute query: {:?}", request_id, e);
+            tracing::error!(
+                "request_id: {} - Failed to execute query: {:?}",
+                request_id,
+                e
+            );
             HttpResponse::InternalServerError().finish()
         }
     }
