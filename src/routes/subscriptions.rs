@@ -20,12 +20,19 @@ pub async fn subscribe(
     // request id to correlate requests with log messages
     let request_id = Uuid::new_v4();
 
-    tracing::info!(
-        "request_id: {} - Adding user: '{}' '{}' as a new subscriber",
-        request_id,
-        form.email,
-        form.name
+    // Spans, like logs, have an associated level
+    // 'info_span' creates a span at the info-level
+    let request_span = tracing::info_span!(
+        "Adding a new subscriber.",
+        %request_id,
+        subscriber_email = %form.email,
+        subscriber_name = %form.name
     );
+
+    // Using 'enter' in an async function is a recipe for disaster
+    // don't try at home...
+    let _request_info_guard = request_span.enter();
+
     tracing::info!(
         "request_id: {} - Saving new subscriber info to database",
         request_id
@@ -51,7 +58,7 @@ pub async fn subscribe(
                 request_id
             );
             HttpResponse::Ok().finish()
-        },
+        }
         Err(e) => {
             tracing::error!(
                 "request_id: {} - Failed to execute query: {:?}",

@@ -2,6 +2,10 @@
 
 Rust project workthrough by Johannes Jyrgenson
 
+## How To's
+
+### running with trace level logs on powershell terminal
+use `$env:RUST_LOG="trace"; cargo run` as the run command to get traces displayed in info logs
 
 ## Issues
 
