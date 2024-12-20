@@ -55,16 +55,11 @@ pub async fn subscribe(
     // first we attach the instrumentation, then we `await` it
     .await
     {
-        Ok(_) => {
-            HttpResponse::Ok().finish()
-        }
+        Ok(_) => HttpResponse::Ok().finish(),
         Err(e) => {
             // this currently falls outside of `query_span`
             // we'll rectify it later
-            tracing::error!(
-                "Failed to execute query: {:?}",
-                e
-            );
+            tracing::error!("Failed to execute query: {:?}", e);
             HttpResponse::InternalServerError().finish()
         }
     }

@@ -10,12 +10,11 @@ use zero2prod::startup::run;
 async fn main() -> Result<(), std::io::Error> {
     // We are falling back to printing all spans at info-level or above
     // if the RUST_LOG environment variable has not been set
-    let env_filter = EnvFilter::try_from_default_env()
-        .unwrap_or_else(|_| EnvFilter::new("info"));
+    let env_filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));
     let formatting_layer = BunyanFormattingLayer::new(
         "zero2prod".into(),
         // output the formatter spans to stdout
-        std::io::stdout
+        std::io::stdout,
     );
     // The `with` method is provided by `SubscriberExt`, an extension
     // trait for `Subscriber` exposed by `tracing_subscriber`
