@@ -18,7 +18,7 @@ use tracing_subscriber::fmt::MakeWriter;
 pub fn get_subscriber<Sink>(
     name: String,
     env_filter: String,
-    sink: Sink
+    sink: Sink,
 ) -> impl Subscriber + Send + Sync
 where
     // syntax for higher-ranked trait bound

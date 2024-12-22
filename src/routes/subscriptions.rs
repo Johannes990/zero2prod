@@ -12,10 +12,8 @@ pub struct FormData {
     name: String,
 }
 
-// simple implementation of subscribe function: we always return 200
 pub async fn subscribe(
     form: web::Form<FormData>,
-    // retrieving the connection from the application state
     pool: web::Data<PgPool>,
 ) -> HttpResponse {
     // request id to correlate requests with log messages
