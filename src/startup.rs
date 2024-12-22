@@ -1,9 +1,9 @@
 use crate::routes::{health_check, subscribe};
 use actix_web::dev::Server;
 use actix_web::{web, App, HttpServer};
-use tracing_actix_web::TracingLogger;
 use sqlx::PgPool;
 use std::net::TcpListener;
+use tracing_actix_web::TracingLogger;
 
 // We return Server on the happy path and we drop the `async` keyword.
 // We have no need for it since we have no .await call.

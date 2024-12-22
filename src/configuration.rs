@@ -18,13 +18,14 @@ pub struct DatabaseSettings {
 
 impl DatabaseSettings {
     pub fn connection_string(&self) -> SecretString {
-        SecretString::from(format!("postgres://{}:{}@{}:{}/{}",
+        SecretString::from(
+            format!("postgres://{}:{}@{}:{}/{}",
             self.username,
             self.password.expose_secret(),
             self.host,
             self.port,
-            self.database_name)
-        )
+            self.database_name
+        ))
     }
 }
 
