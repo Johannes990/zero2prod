@@ -12,7 +12,7 @@ pub struct FormData {
 }
 
 #[tracing::instrument(
-name = "Adding a new subscriber",
+    name = "Adding a new subscriber",
     skip(form, pool),
     fields(
         request_id = %Uuid::new_v4(),
@@ -21,8 +21,7 @@ name = "Adding a new subscriber",
     )
 )]
 pub async fn subscribe(form: web::Form<FormData>, pool: web::Data<PgPool>) -> HttpResponse {
-    match insert_subscriber(&pool, &form).await
-    {
+    match insert_subscriber(&pool, &form).await {
         Ok(_) => HttpResponse::Ok().finish(),
         Err(e) => {
             // this currently falls outside of `query_span`
@@ -34,7 +33,7 @@ pub async fn subscribe(form: web::Form<FormData>, pool: web::Data<PgPool>) -> Ht
 }
 
 #[tracing::instrument(
-name = "Saving new subscriber details in the database",
+    name = "Saving new subscriber details in the database",
     skip(pool, form),
 )]
 pub async fn insert_subscriber(pool: &PgPool, form: &FormData) -> Result<(), sqlx::Error> {
@@ -47,7 +46,10 @@ pub async fn insert_subscriber(pool: &PgPool, form: &FormData) -> Result<(), sql
         form.email,
         form.name,
         Utc::now()
-    ).execute(pool).await.map_err(|e| {
+    )
+    .execute(pool)
+    .await
+    .map_err(|e| {
         tracing::error!("Failed to execute query: {:?}", e);
         e
         // using the `?` operator to return early if the function call failed,
