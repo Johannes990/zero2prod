@@ -1,2 +1,5 @@
 application:
   host: 0.0.0.0
+database:
+  # new entry
+  require_ssl: true

@@ -1,2 +1,5 @@
 application:
   host: 127.0.0.1
+database:
+  # new entry!
+  require_ssl: false

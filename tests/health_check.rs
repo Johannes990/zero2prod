@@ -5,7 +5,7 @@
 //!
 //! we can inspect using
 //! `cargo expand --test health_check` (<- name of the test file)
-use secrecy::{ExposeSecret, SecretString};
+use secrecy::SecretString;
 use sqlx::{Connection, Executor, PgConnection, PgPool};
 use std::net::TcpListener;
 use std::sync::LazyLock;
@@ -72,8 +72,7 @@ pub async fn configure_database(config: &DatabaseSettings) -> PgPool {
         password: SecretString::from("password".to_string()),
         ..config.clone()
     };
-    let mut connection =
-        PgConnection::connect(&maintenance_settings.connection_string().expose_secret())
+    let mut connection = PgConnection::connect_with(&maintenance_settings.connect_options())
             .await
             .expect("Failed to connect to Postgres");
     connection
@@ -82,7 +81,7 @@ pub async fn configure_database(config: &DatabaseSettings) -> PgPool {
         .expect("Failed to create database");
 
     // Migrate database
-    let connection_pool = PgPool::connect(&config.connection_string().expose_secret())
+    let connection_pool = PgPool::connect_with(config.connect_options())
         .await
         .expect("Failed to connect to Postgres");
     sqlx::migrate!("./migrations")
