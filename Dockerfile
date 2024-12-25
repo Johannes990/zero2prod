@@ -1,6 +1,5 @@
 FROM lukemathwalker/cargo-chef:latest-rust-1.83.0 as chef
 WORKDIR /app
-RUN apt update && apt install lld clang -y
 
 FROM chef as planner
 COPY . .
@@ -23,10 +22,9 @@ RUN cargo build --release --bin zero2prod
 FROM debian:bookworm-slim AS runtime
 WORKDIR /app
 # Install OpenSSl - it is dynamically linker by some of our dependencies
-# Install ca-certificates - they are needed to verify TLS certificates
 # when establishing HTTPS connections
 RUN apt-get update -y \
-    && apt-get install -y --no-install-recommends openssl ca-certificates \
+    && apt-get install -y --no-install-recommends openssl \
     # Clean up
     && apt-get autoremove -y \
     && apt-get clean -y \

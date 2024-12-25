@@ -1,0 +1,30 @@
+#! spec.yaml
+name: zero2prod
+# All available regional slugs for Digital Ocean available at
+# https://www.digitalocean.com/docs/app-platform/#regional-availability
+# Closest available is Frankfurt, Germany. Slug `fra1`
+region: fra1
+services:
+  - name: zero2prod
+    # path is relative to repo root
+    dockerfile_path: Dockerfile
+    source_dir: .
+    github:
+      branch: main
+      # Deploy a new version on every commit to `main`
+      # Continuous Deployment, here we come!
+      deploy_on_push: true
+      repo: Johannes990/zero2prod
+    health_check:
+      # path to a health check endpoint
+      # turned out /health_check was useful at the end
+      http_path: /health_check
+    # port listened to on incoming events
+    # should match what we specified in the configuration/production.yaml file
+    http_port: 8000
+    # for production workloads we would want at least two but keep spending under control for now
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    # All incoming requests routed to /app
+    routes:
+      - path: /
