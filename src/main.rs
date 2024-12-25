@@ -1,5 +1,5 @@
-use std::net::TcpListener;
 use sqlx::postgres::PgPoolOptions;
+use std::net::TcpListener;
 use zero2prod::configuration::get_configuration;
 use zero2prod::startup::run;
 use zero2prod::telemetry::{get_subscriber, init_subscriber};
@@ -12,8 +12,8 @@ async fn main() -> Result<(), std::io::Error> {
     // panic if we don't read configuration
     let configuration = get_configuration().expect("Failed to read configuration.");
     // PgPoolOptions::connect_lazy_with instead of connect_lazy
-    let connection_pool = PgPoolOptions::new()
-        .connect_lazy_with(configuration.database.connect_options());
+    let connection_pool =
+        PgPoolOptions::new().connect_lazy_with(configuration.database.connect_options());
     // Bubble up the error if we failed to bind the address
     // otherwise call .await on our server
     let address = format!(
