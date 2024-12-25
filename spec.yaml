@@ -28,3 +28,12 @@ services:
     # All incoming requests routed to /app
     routes:
       - path: /
+databases:
+  # PG = Postgres
+  - engine: PG
+    name: newsletter
+    # keeping the bill lean again
+    num_nodes: 1
+    size: db-s-dev-database
+    # Postgres version
+    version: "13"
