@@ -36,6 +36,10 @@ validator = "0.19.0"
 
 [dev-dependencies]
 claims = "0.8.0"
+fake = "3.0.1"
+quickcheck = "1.0.3"
+quickcheck_macros = "1.0.0"
+rand = "0.8.5"
 
 [dependencies.sqlx]
 version = "0.8"
