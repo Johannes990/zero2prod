@@ -3,3 +3,8 @@ application:
 database:
   # new entry
   require_ssl: true
+email_client:
+  # Value from Postmark's API documentation
+  base_url: "https://api.postmarkapp.com"
+  # use the single sender email you authorized on Postmark!
+  sender_email: "jojurg@taltech.ee"

@@ -2,11 +2,13 @@
 use secrecy::{ExposeSecret, SecretString};
 use serde_aux::prelude::deserialize_number_from_string;
 use sqlx::postgres::{PgConnectOptions, PgSslMode};
+use crate::domain::SubscriberEmail;
 
 #[derive(serde::Deserialize)]
 pub struct Settings {
     pub database: DatabaseSettings,
     pub application: ApplicationSettings,
+    pub email_client: EmailClientSettings,
 }
 
 #[derive(serde::Deserialize, Clone)]
@@ -28,6 +30,12 @@ pub struct ApplicationSettings {
     pub host: String,
 }
 
+#[derive(serde::Deserialize)]
+pub struct EmailClientSettings {
+    pub base_url: String,
+    pub sender_email: String,
+}
+
 impl DatabaseSettings {
     pub fn connect_options(&self) -> PgConnectOptions {
         let ssl_mode = if self.require_ssl {
@@ -43,6 +51,12 @@ impl DatabaseSettings {
             .port(self.port)
             .database(&self.database_name)
             .ssl_mode(ssl_mode)
+    }
+}
+
+impl EmailClientSettings {
+    pub fn sender(&self) -> Result<SubscriberEmail, String> {
+        SubscriberEmail::parse(self.sender_email.clone())
     }
 }
 
