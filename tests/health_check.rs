@@ -18,7 +18,7 @@ static TRACING: LazyLock<()> = LazyLock::new(|| {
     let subscriber_name = "test".to_string();
     // We cannot assign the output of `get_subscriber` to a variable based on the
     // value `TEST_LOG` because the sink is part of the type returned by
-    // `get_subscriber`, therfore they are not the same type. We could work around
+    // `get_subscriber`, therefore they are not the same type. We could work around
     // it, but this is the most straight forward way of moving forward.
     if std::env::var("TEST_LOG").is_ok() {
         let subscriber = get_subscriber(subscriber_name, default_filter_level, std::io::stdout);
@@ -56,8 +56,9 @@ async fn spawn_app() -> TestApp {
     let sender_email = configuration.email_client.sender()
         .expect("Invalid sender email address.");
     let email_client = EmailClient::new(
-        configuration.email_client.base_url,
+        configuration.email_client.base_url.as_str(),
         sender_email,
+        configuration.email_client.authorization_token,
     );
 
     let server = zero2prod::startup::run(listener, connection_pool.clone(), email_client)
@@ -65,7 +66,7 @@ async fn spawn_app() -> TestApp {
 
     // launch the server as a background task
     // tokio::spawn returns a handle to the spawned future
-    // but we have no use for it here, hence the non-binding let
+    // but, we have no use for it here, hence the non-binding let
     let _ = tokio::spawn(server);
 
     TestApp {
