@@ -5,8 +5,8 @@ use crate::email_client::EmailClient;
 use crate::routes::{health_check, subscribe};
 use actix_web::dev::Server;
 use actix_web::{web, App, HttpServer};
-use sqlx::PgPool;
 use sqlx::postgres::PgPoolOptions;
+use sqlx::PgPool;
 use std::net::TcpListener;
 use tracing_actix_web::TracingLogger;
 
@@ -44,7 +44,7 @@ impl Application {
         let server = run(listener, connection_pool, email_client)?;
 
         // We "save" the bound port in one of `Application`'s fields
-        Ok(Self { port, server})
+        Ok(Self { port, server })
     }
 
     pub fn port(&self) -> u16 {
