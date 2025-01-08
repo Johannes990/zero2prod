@@ -1,10 +1,5 @@
-//! tests/health_check.rs
-//!
-//! `tokio::test` is the testing equivalent of `tokio::main`.
-//! It also spares us from having to specify the `#[test]` attribute.
-//!
-//! we can inspect using
-//! `cargo expand --test health_check` (<- name of the test file)
+//! tests/api/helpers.rs
+
 use secrecy::SecretString;
 use sqlx::{Connection, Executor, PgConnection, PgPool};
 use std::net::TcpListener;
@@ -38,7 +33,7 @@ pub struct TestApp {
 // We are also running tests, so it is not worth it to propagate errors.
 // If we fail to perform the required setup we can just panic and crash
 // all the things.
-async fn spawn_app() -> TestApp {
+pub async fn spawn_app() -> TestApp {
     // The first time we `initialize` is invoked the code in `TRACING` is executed.
     // All other invocations will instead skip execution.
     LazyLock::force(&TRACING);
@@ -105,114 +100,4 @@ pub async fn configure_database(config: &DatabaseSettings) -> PgPool {
         .expect("Failed to migrate the database");
 
     connection_pool
-}
-
-#[tokio::test]
-async fn health_check_works() {
-    // arrange
-    let test_app = spawn_app().await;
-    let client = reqwest::Client::new();
-
-    // act
-    let response = client
-        .get(format!("{}/health_check", &test_app.address))
-        .send()
-        .await
-        .expect("Failed to execute request.");
-
-    // assert
-    assert!(response.status().is_success());
-    assert_eq!(Some(0), response.content_length());
-}
-
-#[tokio::test]
-async fn subscribe_returns_200_for_valid_form_data() {
-    // arrange
-    let test_app = spawn_app().await;
-    let client = reqwest::Client::new();
-
-    // act
-    let body = "name=le%20guin&email=ursula_le_guin%40gmail.com";
-    let response = client
-        .post(&format!("{}/subscriptions", &test_app.address))
-        .header("Content-Type", "application/x-www-form-urlencoded")
-        .body(body)
-        .send()
-        .await
-        .expect("Failed to execute request.");
-
-    // assert
-    assert_eq!(200, response.status().as_u16());
-
-    let saved = sqlx::query!("SELECT email, name FROM subscriptions",)
-        .fetch_one(&test_app.db_pool)
-        .await
-        .expect("Failed to fetch saved subscription.");
-
-    assert_eq!(saved.email, "ursula_le_guin@gmail.com");
-    assert_eq!(saved.name, "le guin");
-}
-
-#[tokio::test]
-async fn subscribe_returns_400_when_data_is_missing() {
-    // arrange
-    let test_app = spawn_app().await;
-    let client = reqwest::Client::new();
-    let test_cases = vec![
-        ("name=le%20guin", "missing the email"),
-        ("email=ursula_le_guin%40gmail.com", "missing the name"),
-        ("", "missing both name and email"),
-    ];
-
-    for (invalid_body, error_message) in test_cases {
-        // act
-        let response = client
-            .post(&format!("{}/subscriptions", &test_app.address))
-            .header("Content-Type", "application/x-www-form-urlencoded")
-            .body(invalid_body)
-            .send()
-            .await
-            .expect("Failed to execute request.");
-
-        // assert
-        assert_eq!(
-            400,
-            response.status().as_u16(),
-            // additional customized error message on test failure
-            "The API did not fail with 400 Bad Request when the payload was {}.",
-            error_message
-        );
-    }
-}
-
-#[tokio::test]
-async fn subscribe_returns_a_200_when_fields_are_present_but_empty() {
-    // Arrange
-    let app = spawn_app().await;
-    let client = reqwest::Client::new();
-    let test_cases = vec![
-        ("name=&email=ursula_le_guin%40gmail.com", "empty name"),
-        ("name=Ursula&email=", "empty email"),
-        ("name=Ursula&email=definitely-not-an-email", "invalid email"),
-    ];
-
-    for (body, description) in test_cases {
-        // Act
-        let response = client
-            .post(&format!("{}/subscriptions", &app.address))
-            .header("Content-Type", "application/x-www-form-urlencoded")
-            .body(body)
-            .send()
-            .await
-            .expect("Failed to execute request.");
-
-        // Assert
-        assert_eq!(
-            // not 200 anymore
-            400,
-            response.status().as_u16(),
-            "The API did not return a 400 Bad Request when the payload was {}.",
-            description
-        );
-    }
 }
