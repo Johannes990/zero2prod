@@ -72,9 +72,9 @@ mod tests {
     use fake::faker::lorem::en::{Paragraph, Sentence};
     use fake::{Fake, Faker};
     use secrecy::SecretString;
+    use wiremock::http::Method;
     use wiremock::matchers::{any, header, header_exists, method, path};
     use wiremock::{Mock, MockServer, Request, ResponseTemplate};
-    use wiremock::http::Method;
 
     struct SendEmailBodyMatcher;
 
@@ -105,7 +105,7 @@ mod tests {
         let email_client = EmailClient::new(
             mock_server.uri().as_str(),
             sender,
-            SecretString::from(Faker.fake::<String>())
+            SecretString::from(Faker.fake::<String>()),
         );
         let subscriber_email = SubscriberEmail::parse(SafeEmail().fake()).unwrap();
         let subject: String = Sentence(1..2).fake();
@@ -135,7 +135,7 @@ mod tests {
         let email_client = EmailClient::new(
             mock_server.uri().as_str(),
             sender,
-            SecretString::from(Faker.fake::<String>())
+            SecretString::from(Faker.fake::<String>()),
         );
 
         let subscriber_email = SubscriberEmail::parse(SafeEmail().fake()).unwrap();
@@ -163,7 +163,7 @@ mod tests {
         let email_client = EmailClient::new(
             mock_server.uri().as_str(),
             sender,
-            SecretString::from(Faker.fake::<String>())
+            SecretString::from(Faker.fake::<String>()),
         );
 
         // Mock::given(any()) matches all incoming requests, regardless of
