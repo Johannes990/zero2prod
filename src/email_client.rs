@@ -19,10 +19,7 @@ impl EmailClient {
         timeout: std::time::Duration,
     ) -> EmailClient {
         // Client-side timeout for all requests - 10 seconds.
-        let http_client = Client::builder()
-            .timeout(timeout)
-            .build()
-            .unwrap();
+        let http_client = Client::builder().timeout(timeout).build().unwrap();
         Self {
             http_client,
             base_url: Url::parse(base_url).unwrap(),
