@@ -16,7 +16,9 @@ async fn main() -> Result<(), std::io::Error> {
     let connection_pool =
         PgPoolOptions::new().connect_lazy_with(configuration.database.connect_options());
 
-    let sender_email = configuration.email_client.sender()
+    let sender_email = configuration
+        .email_client
+        .sender()
         .expect("Invalid sender email address.");
     let email_client = EmailClient::new(
         configuration.email_client.base_url.as_str(),

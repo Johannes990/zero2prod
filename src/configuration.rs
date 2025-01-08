@@ -1,8 +1,9 @@
 //! src/configuration.rs
+
+use crate::domain::SubscriberEmail;
 use secrecy::{ExposeSecret, SecretString};
 use serde_aux::prelude::deserialize_number_from_string;
 use sqlx::postgres::{PgConnectOptions, PgSslMode};
-use crate::domain::SubscriberEmail;
 
 #[derive(serde::Deserialize)]
 pub struct Settings {
