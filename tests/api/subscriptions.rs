@@ -9,6 +9,11 @@ async fn subscribe_returns_200_for_valid_form_data() {
     // arrange
     let test_app = spawn_app().await;
     let body = "name=le%20guin&email=ursula_le_guin%40gmail.com";
+    Mock::given(path("/email"))
+        .and(method("POST"))
+        .respond_with(ResponseTemplate::new(200))
+        .mount(&test_app.email_server)
+        .await;
 
     // act
     let response = test_app.post_subscriptions(body.into()).await;
