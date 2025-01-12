@@ -35,14 +35,13 @@ impl TryFrom<FormData> for NewSubscriber {
 pub async fn subscribe(
     form: web::Form<FormData>,
     pool: web::Data<PgPool>,
-    email_client: web::Data<EmailClient>
+    email_client: web::Data<EmailClient>,
 ) -> HttpResponse {
     let new_subscriber = match form.0.try_into() {
         Ok(form) => form,
         Err(_) => return HttpResponse::BadRequest().finish(),
     };
-    if insert_subscriber(&pool, &new_subscriber).await.is_err()
-    {
+    if insert_subscriber(&pool, &new_subscriber).await.is_err() {
         return HttpResponse::InternalServerError().finish();
     }
     // Send a (useless) email to the new subscriber.
@@ -55,7 +54,8 @@ pub async fn subscribe(
             "Welcome to our newsletter!",
         )
         .await
-        .is_err() {
+        .is_err()
+    {
         return HttpResponse::InternalServerError().finish();
     }
     HttpResponse::Ok().finish()
