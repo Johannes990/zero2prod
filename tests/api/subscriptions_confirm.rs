@@ -2,7 +2,7 @@
 
 use crate::helpers::spawn_app;
 use reqwest::Url;
-use wiremock::matchers::{path, method};
+use wiremock::matchers::{method, path};
 use wiremock::{Mock, ResponseTemplate};
 
 #[tokio::test]

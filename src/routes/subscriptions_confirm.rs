@@ -1,6 +1,6 @@
 //! src/routes/subscriptions_confirm.rs
 
-use actix_web::{HttpResponse, web};
+use actix_web::{web, HttpResponse};
 
 // This `Parameters` struct defines all the values we expect to see in
 // the incoming request.
