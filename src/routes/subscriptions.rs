@@ -48,11 +48,7 @@ pub async fn subscribe(
     }
     // Send a (useless) email to the new subscriber with a non-existent confirmation link.
     // We are ignoring email delivery errors for now.
-    if send_confirmation_email(
-        &email_client,
-        new_subscriber,
-        &base_url.0,
-    )
+    if send_confirmation_email(&email_client, new_subscriber, &base_url.0)
         .await
         .is_err()
     {

@@ -2,8 +2,8 @@
 
 use crate::helpers::spawn_app;
 use reqwest::Url;
-use wiremock::{ResponseTemplate, Mock};
 use wiremock::matchers::{path, method};
+use wiremock::{Mock, ResponseTemplate};
 
 #[tokio::test]
 async fn confirmations_without_token_are_rejected_with_a_400() {
@@ -32,8 +32,7 @@ async fn the_link_required_by_subscribe_returns_a_200_if_called() {
 
     test_app.post_subscriptions(body.into()).await;
     let email_request = &test_app.email_server.received_requests().await.unwrap()[0];
-    let body: serde_json::Value = serde_json::from_slice(&email_request.body)
-        .unwrap();
+    let body: serde_json::Value = serde_json::from_slice(&email_request.body).unwrap();
     // Extract the link from one of the request fields
     let link = |s: &str| {
         let links: Vec<_> = linkify::LinkFinder::new()

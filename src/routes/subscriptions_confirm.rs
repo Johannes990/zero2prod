@@ -5,14 +5,12 @@ use actix_web::{HttpResponse, web};
 // This `Parameters` struct defines all the values we expect to see in
 // the incoming request.
 #[derive(serde::Deserialize)]
+#[allow(dead_code)]
 pub struct Parameters {
-    subscription_token: String
+    subscription_token: String,
 }
 
-#[tracing::instrument(
-    name = "Confirm a pending subscriber",
-    skip(_parameters)
-)]
+#[tracing::instrument(name = "Confirm a pending subscriber", skip(_parameters))]
 // actix-web will only call handler if the extraction was successful
 // it is enough to add parameters to our `confirm()` method parameters
 // for actix-web to work.
