@@ -5,8 +5,8 @@ use crate::email_client::EmailClient;
 use crate::startup::ApplicationBaseUrl;
 use actix_web::{web, HttpResponse};
 use chrono::Utc;
-use rand::{thread_rng, Rng};
 use rand::distributions::Alphanumeric;
+use rand::{thread_rng, Rng};
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -63,7 +63,7 @@ pub async fn subscribe(
         .await
         .is_err()
     {
-        return HttpResponse::InternalServerError().finish()
+        return HttpResponse::InternalServerError().finish();
     }
     if send_confirmation_email(
         &email_client,
@@ -71,8 +71,8 @@ pub async fn subscribe(
         &base_url.0,
         &subscription_token,
     )
-        .await
-        .is_err()
+    .await
+    .is_err()
     {
         return HttpResponse::InternalServerError().finish();
     }
@@ -91,8 +91,7 @@ pub async fn send_confirmation_email(
 ) -> Result<(), reqwest::Error> {
     let confirmation_link = format!(
         "{}/subscriptions/confirm?subscription_token={}",
-        base_url,
-        subscription_token,
+        base_url, subscription_token,
     );
     let plain_body = format!(
         "Welcome to our newsletter!\nVisit {} to confirm your subscription.",
@@ -145,7 +144,7 @@ pub async fn insert_subscriber(
 pub async fn store_token(
     pool: &PgPool,
     subscription_id: Uuid,
-    subscription_token: &str
+    subscription_token: &str,
 ) -> Result<(), sqlx::Error> {
     sqlx::query!(
         r#"INSERT INTO subscription_tokens (subscription_token, subscription_id)
@@ -153,11 +152,11 @@ pub async fn store_token(
         subscription_token,
         subscription_id
     )
-        .execute(pool)
-        .await
-        .map_err(|e| {
-            tracing::error!("Failed to execute query: {:?}", e);
-            e
-        })?;
+    .execute(pool)
+    .await
+    .map_err(|e| {
+        tracing::error!("Failed to execute query: {:?}", e);
+        e
+    })?;
     Ok(())
 }
