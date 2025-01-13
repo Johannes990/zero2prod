@@ -48,7 +48,12 @@ pub async fn subscribe(
     }
     // Send a (useless) email to the new subscriber with a non-existent confirmation link.
     // We are ignoring email delivery errors for now.
-    if send_confirmation_email(&email_client, new_subscriber, &base_url.0)
+    if send_confirmation_email(
+        &email_client,
+        new_subscriber,
+        &base_url.0,
+        "mytoken",
+    )
         .await
         .is_err()
     {
@@ -59,17 +64,19 @@ pub async fn subscribe(
 
 #[tracing::instrument(
     name = "Send a confirmation email to a new subscriber",
-    skip(email_client, new_subscriber, base_url)
+    skip(email_client, new_subscriber, base_url, subscription_token)
 )]
 pub async fn send_confirmation_email(
     email_client: &EmailClient,
     new_subscriber: NewSubscriber,
     base_url: &str,
+    subscription_token: &str,
 ) -> Result<(), reqwest::Error> {
     // hardcode the confirmation token for now
     let confirmation_link = format!(
-        "{}/subscriptions/confirm?subscription_token=mytoken",
-        base_url
+        "{}/subscriptions/confirm?subscription_token={}",
+        base_url,
+        subscription_token,
     );
     let plain_body = format!(
         "Welcome to our newsletter!\nVisit {} to confirm your subscription.",

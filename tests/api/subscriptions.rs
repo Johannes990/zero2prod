@@ -101,7 +101,7 @@ async fn subscribe_returns_a_200_when_fields_are_present_but_empty() {
 async fn subscribe_sends_a_confirmation_email_for_valid_data() {
     // Arrange
     let test_app = spawn_app().await;
-    let body = "name=le%20gui&email=ursula_le_gui%40gmail.com";
+    let body = "name=le%20guin&email=ursula_le_guin%40gmail.com";
 
     Mock::given(path("/email"))
         .and(method("POST"))
@@ -121,7 +121,7 @@ async fn subscribe_sends_a_confirmation_email_for_valid_data() {
 async fn subscribe_sends_a_confirmation_email_with_a_link() {
     // Arrange
     let test_app = spawn_app().await;
-    let body = "name=le%20gui&email=ursula_le_gui%40gmail.com";
+    let body = "name=le%20guin&email=ursula_le_guin%40gmail.com";
 
     Mock::given(path("/email"))
         .and(method("POST"))
