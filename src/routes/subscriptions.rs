@@ -58,10 +58,7 @@ pub async fn subscribe(
         Ok(transaction) => transaction,
         Err(_) => return HttpResponse::InternalServerError().finish(),
     };
-    let subscriber_id = match insert_subscriber(
-        &mut transaction,
-        &new_subscriber,
-    ).await {
+    let subscriber_id = match insert_subscriber(&mut transaction, &new_subscriber, ).await {
         Ok(subscriber_id) => subscriber_id,
         Err(_) => return HttpResponse::InternalServerError().finish(),
     };
@@ -136,9 +133,7 @@ pub async fn insert_subscriber(
         new_subscriber.name.as_ref(),
         Utc::now()
     );
-    transaction.execute(query)
-    .await
-    .map_err(|e| {
+    transaction.execute(query).await.map_err(|e| {
         tracing::error!("Failed to execute query: {:?}", e);
         e
         // using the `?` operator to return early if the function call failed,
@@ -162,9 +157,7 @@ pub async fn store_token(
         subscription_token,
         subscription_id
     );
-    transaction.execute(query)
-    .await
-    .map_err(|e| {
+    transaction.execute(query).await.map_err(|e| {
         tracing::error!("Failed to execute query: {:?}", e);
         e
     })?;
