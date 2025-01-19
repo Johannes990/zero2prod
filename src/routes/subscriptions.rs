@@ -1,6 +1,5 @@
 //! src/routes/subscriptions.rs
 
-use std::fmt::{Display, Formatter};
 use crate::domain::{NewSubscriber, SubscriberEmail, SubscriberName};
 use crate::email_client::EmailClient;
 use crate::startup::ApplicationBaseUrl;
@@ -9,6 +8,7 @@ use chrono::Utc;
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
 use sqlx::{Executor, PgPool, Postgres, Transaction};
+use std::fmt::{Display, Formatter};
 use uuid::Uuid;
 
 #[allow(dead_code)]
@@ -153,9 +153,10 @@ pub async fn store_token(
         subscription_token,
         subscription_id
     );
-    transaction.execute(query).await.map_err(|e| {
-        StoreTokenError(e)
-    })?;
+    transaction
+        .execute(query)
+        .await
+        .map_err(|e| StoreTokenError(e))?;
     Ok(())
 }
 
