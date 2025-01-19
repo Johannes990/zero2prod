@@ -175,13 +175,17 @@ pub struct StoreTokenError(sqlx::Error);
 
 impl std::fmt::Display for StoreTokenError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        error_chain_fmt(self, f)
+        write!(
+            f,
+            "A database error was encountered while \
+            trying to store a subscription token."
+        )
     }
 }
 
 impl std::fmt::Debug for StoreTokenError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}\nCaused by:\n\t{}", self, self.0)
+        error_chain_fmt(self, f)
     }
 }
 
