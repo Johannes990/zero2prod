@@ -8,7 +8,6 @@ use chrono::Utc;
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
 use sqlx::{Executor, PgPool, Postgres, Transaction};
-use std::fmt::{Display, Formatter};
 use uuid::Uuid;
 
 #[allow(dead_code)]
@@ -156,22 +155,34 @@ pub async fn store_token(
     transaction
         .execute(query)
         .await
-        .map_err(|e| StoreTokenError(e))?;
+        .map_err(StoreTokenError)?;
     Ok(())
 }
 
 // A new error type, wrapping sqlx::Error
 #[allow(dead_code)]
-#[derive(Debug)]
 pub struct StoreTokenError(sqlx::Error);
 
-impl Display for StoreTokenError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+impl std::fmt::Display for StoreTokenError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
             "A database error was encountered while \
             trying to store a subscription token."
         )
+    }
+}
+
+impl std::fmt::Debug for StoreTokenError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}\nCaused by:\n\t{}", self, self.0)
+    }
+}
+
+impl std::error::Error for StoreTokenError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        // The compiler transparently casts $sqlx::Error into a &dyn Error
+        Some(&self.0)
     }
 }
 
