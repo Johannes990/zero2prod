@@ -161,6 +161,7 @@ pub async fn store_token(
 }
 
 // A new error type, wrapping sqlx::Error
+#[allow(dead_code)]
 #[derive(Debug)]
 pub struct StoreTokenError(sqlx::Error);
 
