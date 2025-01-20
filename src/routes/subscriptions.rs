@@ -9,6 +9,7 @@ use chrono::Utc;
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
 use sqlx::{Executor, PgPool, Postgres, Transaction};
+use std::fmt::{Debug, Formatter};
 use uuid::Uuid;
 
 #[allow(dead_code)]
@@ -28,12 +29,19 @@ impl TryFrom<FormData> for NewSubscriber {
     }
 }
 
+#[derive(thiserror::Error)]
 pub enum SubscribeError {
+    #[error("{0}")]
     ValidationError(String),
+    #[error("Failed to acquire a Postgres connection from the pool.")]
     PoolError(sqlx::Error),
+    #[error("Failed to insert a new subscriber into the database.")]
     InsertSubscriberError(sqlx::Error),
+    #[error("Failed to commit the SQL transaction to store a new subscriber.")]
     TransactionCommitError(sqlx::Error),
+    #[error("Failed to store confirmation token for a new subscriber.")]
     StoreTokenError(StoreTokenError),
+    #[error("Failed to send a confirmation email.")]
     SendEmailError(reqwest::Error),
 }
 
@@ -48,12 +56,6 @@ impl From<StoreTokenError> for SubscribeError {
         Self::StoreTokenError(e)
     }
 }
-/*
-impl From<sqlx::Error> for SubscribeError {
-    fn from(e: sqlx::Error) -> Self {
-        Self::DatabaseError(e)
-    }
-}*/
 
 impl From<String> for SubscribeError {
     fn from(e: String) -> Self {
@@ -61,50 +63,9 @@ impl From<String> for SubscribeError {
     }
 }
 
-impl std::fmt::Debug for SubscribeError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl Debug for SubscribeError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         error_chain_fmt(self, f)
-    }
-}
-
-impl std::error::Error for SubscribeError {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        match self {
-            // &str does not implement `Error`, we consider it the root cause
-            SubscribeError::ValidationError(_) => None,
-            SubscribeError::SendEmailError(e) => Some(e),
-            SubscribeError::StoreTokenError(e) => Some(e),
-            SubscribeError::PoolError(e) => Some(e),
-            SubscribeError::InsertSubscriberError(e) => Some(e),
-            SubscribeError::TransactionCommitError(e) => Some(e),
-        }
-    }
-}
-
-impl std::fmt::Display for SubscribeError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            SubscribeError::ValidationError(e) => write!(f, "{}", e),
-            SubscribeError::SendEmailError(_) => {
-                write!(f, "Failed to send a confirmation email.")
-            }
-            SubscribeError::StoreTokenError(_) => write!(
-                f,
-                "Failed to store the confirmation token for a new subscriber."
-            ),
-            SubscribeError::PoolError(_) => {
-                write!(f, "Failed to aquire a Postgres connection from the pool.")
-            }
-            SubscribeError::TransactionCommitError(_) => {
-                write!(
-                    f,
-                    "Failed to commit the SQL transaction to store a new subscriber."
-                )
-            }
-            SubscribeError::InsertSubscriberError(_) => {
-                write!(f, "Failed to insert a new subscriber into the database.")
-            }
-        }
     }
 }
 
@@ -184,7 +145,7 @@ pub async fn subscribe(
     email_client: web::Data<EmailClient>,
     base_url: web::Data<ApplicationBaseUrl>,
 ) -> Result<HttpResponse, SubscribeError> {
-    let new_subscriber = form.0.try_into()?;
+    let new_subscriber = form.0.try_into().map_err(SubscribeError::ValidationError)?;
     let mut transaction = pool.begin().await.map_err(SubscribeError::PoolError)?;
     let subscriber_id = insert_subscriber(&mut transaction, &new_subscriber)
         .await
