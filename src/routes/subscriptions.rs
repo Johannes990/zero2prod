@@ -85,22 +85,25 @@ impl std::fmt::Display for SubscribeError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             SubscribeError::ValidationError(e) => write!(f, "{}", e),
-            SubscribeError::SendEmailError(_) =>  {
+            SubscribeError::SendEmailError(_) => {
                 write!(f, "Failed to send a confirmation email.")
-            },
+            }
             SubscribeError::StoreTokenError(_) => write!(
                 f,
                 "Failed to store the confirmation token for a new subscriber."
             ),
             SubscribeError::PoolError(_) => {
                 write!(f, "Failed to aquire a Postgres connection from the pool.")
-            },
+            }
             SubscribeError::TransactionCommitError(_) => {
-                write!(f, "Failed to commit the SQL transaction to store a new subscriber.")
-            },
+                write!(
+                    f,
+                    "Failed to commit the SQL transaction to store a new subscriber."
+                )
+            }
             SubscribeError::InsertSubscriberError(_) => {
                 write!(f, "Failed to insert a new subscriber into the database.")
-            },
+            }
         }
     }
 }
