@@ -3,8 +3,8 @@
 use crate::domain::{NewSubscriber, SubscriberEmail, SubscriberName};
 use crate::email_client::EmailClient;
 use crate::startup::ApplicationBaseUrl;
-use actix_web::{web, HttpResponse, ResponseError};
 use actix_web::http::StatusCode;
+use actix_web::{web, HttpResponse, ResponseError};
 use chrono::Utc;
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
@@ -75,10 +75,7 @@ impl ResponseError for SubscribeError {
 
 impl std::fmt::Display for SubscribeError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "Failed to create a new subscriber."
-        )
+        write!(f, "Failed to create a new subscriber.")
     }
 }
 
@@ -151,7 +148,13 @@ pub async fn subscribe(
     let subscription_token = generate_subscription_token();
     store_token(&mut transaction, subscriber_id, &subscription_token).await?;
     transaction.commit().await?;
-    send_confirmation_email(&email_client, new_subscriber, &base_url.0, &subscription_token).await?;
+    send_confirmation_email(
+        &email_client,
+        new_subscriber,
+        &base_url.0,
+        &subscription_token,
+    )
+    .await?;
     Ok(HttpResponse::Ok().finish())
 }
 
