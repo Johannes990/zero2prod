@@ -1,11 +1,11 @@
 //! src/routes/subscriptions_confirm.rs
 
-use actix_web::{web, HttpResponse, ResponseError};
+use crate::routes::error_chain_fmt;
 use actix_web::http::StatusCode;
+use actix_web::{web, HttpResponse, ResponseError};
 use anyhow::Context;
 use sqlx::PgPool;
 use uuid::Uuid;
-use crate::routes::error_chain_fmt;
 
 // This `Parameters` struct defines all the values we expect to see in
 // the incoming request.
@@ -29,7 +29,9 @@ impl std::fmt::Debug for SubscriptionConfirmationError {
 impl ResponseError for SubscriptionConfirmationError {
     fn status_code(&self) -> StatusCode {
         match self {
-            SubscriptionConfirmationError::ConfirmationError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            SubscriptionConfirmationError::ConfirmationError(_) => {
+                StatusCode::INTERNAL_SERVER_ERROR
+            }
         }
     }
 }
@@ -40,7 +42,7 @@ impl ResponseError for SubscriptionConfirmationError {
 // for actix-web to work.
 pub async fn confirm(
     parameters: web::Query<Parameters>,
-    pool: web::Data<PgPool>
+    pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, SubscriptionConfirmationError> {
     let id = get_subscriber_id_from_token(&pool, &parameters.subscription_token)
         .await
