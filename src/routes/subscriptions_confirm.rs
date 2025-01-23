@@ -32,9 +32,7 @@ impl ResponseError for SubscriptionConfirmationError {
     fn status_code(&self) -> StatusCode {
         match self {
             SubscriptionConfirmationError::UnknownTokenError => StatusCode::UNAUTHORIZED,
-            SubscriptionConfirmationError::UnexpectedError(_) => {
-                StatusCode::INTERNAL_SERVER_ERROR
-            }
+            SubscriptionConfirmationError::UnexpectedError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 }
@@ -58,10 +56,7 @@ pub async fn confirm(
 }
 
 #[tracing::instrument(name = "Mark subscriber as confirmed", skip(subscriber_id, pool))]
-pub async fn confirm_subscriber(
-    pool: &PgPool,
-    subscriber_id: Uuid,
-) -> Result<(), sqlx::Error> {
+pub async fn confirm_subscriber(pool: &PgPool, subscriber_id: Uuid) -> Result<(), sqlx::Error> {
     sqlx::query!(
         r#"UPDATE subscriptions SET status = 'confirmed' WHERE id = $1"#,
         subscriber_id,

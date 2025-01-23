@@ -97,9 +97,7 @@ async fn get_subscription_id_from_token_fails_with_incorrect_token() {
         .collect::<Vec<&str>>();
     link_parts.pop();
     link_parts.insert(1, bad_token);
-    let compromised_link = reqwest::Url::parse(link_parts.join("=")
-        .as_str())
-        .unwrap();
+    let compromised_link = reqwest::Url::parse(link_parts.join("=").as_str()).unwrap();
 
     let response = reqwest::get(compromised_link).await.unwrap();
 
