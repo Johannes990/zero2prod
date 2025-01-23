@@ -17,7 +17,9 @@ pub struct Parameters {
 #[derive(thiserror::Error)]
 pub enum SubscriptionConfirmationError {
     #[error(transparent)]
-    ConfirmationError(#[from] anyhow::Error),
+    UnexpectedError(#[from] anyhow::Error),
+    #[error("No subscriber linked with this token.")]
+    UnknownTokenError,
 }
 
 impl std::fmt::Debug for SubscriptionConfirmationError {
@@ -29,7 +31,8 @@ impl std::fmt::Debug for SubscriptionConfirmationError {
 impl ResponseError for SubscriptionConfirmationError {
     fn status_code(&self) -> StatusCode {
         match self {
-            SubscriptionConfirmationError::ConfirmationError(_) => {
+            SubscriptionConfirmationError::UnknownTokenError => StatusCode::UNAUTHORIZED,
+            SubscriptionConfirmationError::UnexpectedError(_) => {
                 StatusCode::INTERNAL_SERVER_ERROR
             }
         }
@@ -46,15 +49,19 @@ pub async fn confirm(
 ) -> Result<HttpResponse, SubscriptionConfirmationError> {
     let id = get_subscriber_id_from_token(&pool, &parameters.subscription_token)
         .await
-        .context("Failed to retrieve subscriber id from the database using given token.")?;
-    confirm_subscriber(&pool, id.unwrap())
+        .context("Failed to retrieve subscriber id from the database using given token.")?
+        .ok_or(SubscriptionConfirmationError::UnknownTokenError)?;
+    confirm_subscriber(&pool, id)
         .await
         .context("Failed to set subscription status to `confirmed` in the database.")?;
     Ok(HttpResponse::Ok().finish())
 }
 
 #[tracing::instrument(name = "Mark subscriber as confirmed", skip(subscriber_id, pool))]
-pub async fn confirm_subscriber(pool: &PgPool, subscriber_id: Uuid) -> Result<(), sqlx::Error> {
+pub async fn confirm_subscriber(
+    pool: &PgPool,
+    subscriber_id: Uuid,
+) -> Result<(), sqlx::Error> {
     sqlx::query!(
         r#"UPDATE subscriptions SET status = 'confirmed' WHERE id = $1"#,
         subscriber_id,
