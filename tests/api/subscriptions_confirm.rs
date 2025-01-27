@@ -115,11 +115,7 @@ async fn subscription_confirm_returns_500_when_no_status_field_present() {
         .await;
 
     test_app.post_subscriptions(body.into()).await;
-    let email_request = &test_app
-        .email_server
-        .received_requests()
-        .await
-        .unwrap()[0];
+    let email_request = &test_app.email_server.received_requests().await.unwrap()[0];
     let confirmation_links = test_app.get_confirmation_links(&email_request);
 
     sqlx::query!("ALTER TABLE subscriptions DROP COLUMN status;")
