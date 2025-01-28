@@ -1,12 +1,12 @@
 //! src/routes/newsletters.rs
 
-use actix_web::{web, HttpResponse, ResponseError};
-use actix_web::http::StatusCode;
-use anyhow::Context;
-use sqlx::PgPool;
 use crate::domain::SubscriberEmail;
 use crate::email_client::EmailClient;
 use crate::routes::error_chain_fmt;
+use actix_web::http::StatusCode;
+use actix_web::{web, HttpResponse, ResponseError};
+use anyhow::Context;
+use sqlx::PgPool;
 
 #[derive(serde::Deserialize)]
 pub struct BodyData {
@@ -63,10 +63,7 @@ pub async fn publish_newsletter(
                     )
                     .await
                     .with_context(|| {
-                        format!(
-                            "Failed to send newsletter issue to {}",
-                            subscriber.email
-                        )
+                        format!("Failed to send newsletter issue to {}", subscriber.email)
                     })?;
             }
             Err(error) => {
@@ -77,7 +74,6 @@ pub async fn publish_newsletter(
                 )
             }
         }
-
     }
     Ok(HttpResponse::Ok().finish())
 }
@@ -85,7 +81,6 @@ pub async fn publish_newsletter(
 #[tracing::instrument(name = "Get confirmed subscribers", skip(pool))]
 async fn get_confirmed_subscribers(
     pool: &PgPool,
-
     // We are returning a `Vec` of `Result`'s here in the happy case
     // This allows the caller to bubble up errors due to network issues or other
     // transient failures using the `?` operator, while the compiler
