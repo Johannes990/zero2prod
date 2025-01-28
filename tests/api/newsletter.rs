@@ -111,3 +111,41 @@ async fn create_confirmed_subscriber(test_app: &TestApp) {
         .error_for_status()
         .unwrap();
 }
+
+#[tokio::test]
+async fn newsletters_returns_400_for_invalid_data() {
+    // Arrange
+    let test_app = spawn_app().await;
+    let test_cases = vec![
+        (
+            serde_json::json!({
+                "content": {
+                    "text": "Newsletter body as plain text",
+                    "html": "<p>Newsletter body as HTML</p>",
+                }
+            }),
+            "missing title",
+        ),
+        (
+            serde_json::json!({"title": "Newsletter!"}),
+            "missing content",
+        ),
+    ];
+
+    for (invalid_body, error_message) in test_cases {
+        let response = reqwest::Client::new()
+            .post(&format!("{}/newsletters", &test_app.address))
+            .json(&invalid_body)
+            .send()
+            .await
+            .expect("Failed to execute request.");
+
+        // Assert
+        assert_eq!(
+            400,
+            response.status().as_u16(),
+            "The API dod not fail with 400 Bad Request when the payload was {}.",
+            error_message
+        );
+    }
+}
